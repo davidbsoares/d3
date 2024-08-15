@@ -5,9 +5,11 @@ import { format } from "core/numbers";
 
 import Svg from "core/ui/Svg";
 import Box from "core/ui/Box";
-
-import { Item, Raw, Row, X, Y } from "./Types";
 import Loading from "core/ui/Loading";
+
+import { Item, Raw, Row, X, Y, S, Filter, Values } from "./Types";
+import Select from "core/ui/Select";
+import Text from "core/ui/Text";
 
 
 const l = {
@@ -15,8 +17,14 @@ const l = {
 	height: 600,
 	width: 800,
 	margin: { top: 20, right: 30, bottom: 65, left: 90 },
-	x: (d: Row) => d.petal_length,
-	y: (d: Row) => d.sepal_width,
+	x: (d: Row, v: Values) => d[v],
+	y: (d: Row, v: Values) => d[v],
+	options: [
+		{ value: "petal_length", label: "Petal Length" },
+		{ value: "petal_width", label: "Petal Width" },
+		{ value: "sepal_length", label: "Sepal Length" },
+		{ value: "sepal_width", label: "Sepal Width" }
+	],
 	label: {
 		x: 40,
 		y: -50
@@ -48,7 +56,7 @@ const useData = () => {
 	return data;
 };
 
-Scatter.X = ({ x, fmt }: X) =>	{
+Scatter.X = ({ x, fmt }: X) => {
 	return x.ticks().map(t => (
 		<Svg.G transform={`translate(${x(t)},0)`} key={t}>
 			<Svg.Line y2={inner.height} className="stroke-gray-300" />
@@ -57,16 +65,16 @@ Scatter.X = ({ x, fmt }: X) =>	{
 	));
 };
 
-Scatter.Y = ({ y }: Y) => y.ticks().map(t => (
-	<Svg.G transform={`translate(0,${y(t)})`}>
+Scatter.Y = ({ y }: Y) => y.ticks().map((t, i) => (
+	<Svg.G transform={`translate(0,${y(t)})`} key={i}>
 		<Svg.Line x2={inner.width} className="stroke-gray-300" />
-		<Svg.Text x={-5} dy="0.32em" className="font-serif fill-gray-500" textAnchor="end" key={t}>{t}</Svg.Text>
+		<Svg.Text x={-5} dy="0.32em" className="font-serif fill-gray-500" textAnchor="end">{t}</Svg.Text>
 	</Svg.G>
 ));
 
-Scatter.Item = ({ x, y, d }: Item) => {
-	const a = l.x(d);
-	const b = l.y(d);
+Scatter.Item = ({ x, y, d, filter }: Item) => {
+	const a = l.x(d, filter.x);
+	const b = l.y(d, filter.y);
 
 	return (
 		<Svg.Circle cx={x(a)} cy={y(b)} r={5} className="fill-teal-500">
@@ -75,28 +83,47 @@ Scatter.Item = ({ x, y, d }: Item) => {
 	);
 };
 
+
+const _Select = ({ setFilter, filter }: S) => {
+	const change = (v: string, filter: "x" | "y") => setFilter(s => ({ ...s, [filter]: v }));
+
+	return (
+		<Box className="items-center gap-1">
+			<Text.H3>{filter.toUpperCase()}</Text.H3>
+			<Select options={l.options} onChange={v => change(v.value, filter)} />
+		</Box>
+	);
+};
+
 export default function Scatter() {
 	const data = useData();
+	const [filter, setFilter] = useState<Filter>({ x: "petal_length", y: "sepal_width" });
 
 	if (!data) return <Loading />;
 
 	const x = scaleLinear()
 		.domain([
-			min(data, l.x) as number,
-			max(data, l.x) as number
+			min(data, (d) => l.x(d, filter.x)) as number,
+			max(data, (d) => l.x(d, filter.x)) as number
 		])
 		.range([0, inner.width])
 		.nice();
+
 	const y = scaleLinear()
 		.domain([
-			min(data, l.y) as number,
-			max(data, l.y) as number
+			min(data, (d) => l.y(d, filter.y)) as number,
+			max(data, (d) => l.y(d, filter.y)) as number
 		])
 		.range([0, inner.height])
 		.nice();
 
+
 	return (
 		<Box.Column className="h-dvh">
+			<Box className="justify-center gap-8">
+				<_Select filter="x" setFilter={setFilter} />
+				<_Select filter="y" setFilter={setFilter} />
+			</Box>
 			<Svg width={l.width} height={l.height}>
 				<Svg.G transform={`translate(${l.margin.left},${l.margin.right})`}>
 					<Scatter.X x={x} />
@@ -104,7 +131,7 @@ export default function Scatter() {
 						Petal Length
 					</Svg.Text>
 					<Scatter.Y y={y} />
-					{data.map(d => <Scatter.Item x={x} y={y} d={d} key={d.species} />)}
+					{data.map((d, i) => <Scatter.Item x={x} y={y} d={d} filter={filter} key={i} />)}
 					<Svg.Text x={inner.width / 2} y={inner.height + l.label.x} textAnchor="middle" className="text-2xl fill-gray-500">
 						Petal Length
 					</Svg.Text>
