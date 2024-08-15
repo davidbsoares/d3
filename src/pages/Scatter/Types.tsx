@@ -1,4 +1,4 @@
-import { ScaleLinear } from "d3";
+import { ScaleLinear, ScaleOrdinal } from "d3";
 
 export type Raw = {
     [key: string]: string | number;
@@ -14,7 +14,7 @@ export type Row = {
 
 export type Values = "petal_length" | "petal_width" | "sepal_length" | "sepal_width"
 
-export type Filter = {
+export type FilterType = {
     x: Values,
     y: Values
 }
@@ -28,12 +28,25 @@ export type Y = {
     y: ScaleLinear<number, number, never>;
 }
 
-export type Item = X & Y & {
-    d: Row;
-    filter: Filter
+export type Color = {
+    color: ScaleOrdinal<string, string, never>
+}
+
+export type Scale = X & Y & Color
+
+export type Marks = {
+    data: Row[];
+    filter: FilterType;
+    scale: Scale
+}
+
+export type LegendType = Color & {
+    size?: number;
+    spacing?: number;
+    offset?: number
 }
 
 export type S = {
     filter: "x" | "y"
-    setFilter: React.Dispatch<React.SetStateAction<Filter>>;
+    setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
 }
