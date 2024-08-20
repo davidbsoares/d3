@@ -43,7 +43,9 @@ export type Marks = {
 export type LegendType = Color & {
     size?: number;
     spacing?: number;
-    offset?: number
+    offset?: number;
+    focused: string;
+    onFocus: React.Dispatch<React.SetStateAction<string>>
 }
 
 export type S = {

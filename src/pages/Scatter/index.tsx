@@ -76,18 +76,20 @@ Scatter.Marks = ({ data, scale, filter }: Marks) => data.map((d, k) => {
 	);
 });
 
-Scatter.Legend = ({ color, spacing = 20, size = 7, offset = 20 }: LegendType) => color.domain().map((v, i) => (
-	<Svg.G transform={`translate(0,${i * spacing})`}>
+Scatter.Legend = ({ color, spacing = 20, size = 7, offset = 20, focused, onFocus: onHover }: LegendType) => color.domain().map((v, i) => (
+	<Svg.G transform={`translate(0,${i * spacing})`} opacity={focused && v !== focused ? 0.2 : 1} onMouseEnter={() => onHover(v)} onMouseLeave={() => onHover("")} key={i}>
 		<Svg.Circle fill={color(v)} r={size} />
-		<Svg.Text x={offset} dy=".32em">{v}</Svg.Text>
+		<Svg.Text x={offset} dy=".32em" className="cursor-default">{v}</Svg.Text>
 	</Svg.G>
 ));
 
 export default function Scatter() {
 	const data = useData();
 	const [filter, setFilter] = useState<FilterType>({ x: "petal_length", y: "sepal_width" });
+	const [focused, setFocused] = useState("");
 
 	if (!data) return <Loading />;
+	const filtered = data.filter(d => focused === l.color(d));
 
 	const scale = {
 		x: scaleLinear()
@@ -126,9 +128,12 @@ export default function Scatter() {
 						<Svg.Text x={35} y={-25} textAnchor="middle" className="text-2xl fill-gray-500">
 							Species
 						</Svg.Text>
-						<Scatter.Legend color={scale.color} />
+						<Scatter.Legend color={scale.color} focused={focused} onFocus={setFocused} />
 					</Svg.G>
-					<Scatter.Marks data={data} scale={scale} filter={filter} />
+					<Svg.G opacity={focused ? 0.2 : 1}>
+						<Scatter.Marks data={data} scale={scale} filter={filter} />
+					</Svg.G>
+					<Scatter.Marks data={filtered} scale={scale} filter={filter} />
 					<Svg.Text x={inner.width / 2} y={inner.height + l.label.x} textAnchor="middle" className="text-2xl fill-gray-500">
 						Petal Length
 					</Svg.Text>
