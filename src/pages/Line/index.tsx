@@ -7,7 +7,7 @@ import Svg from "core/ui/Svg";
 import Box from "core/ui/Box";
 import Loading from "core/ui/Loading";
 
-import { Marks, Raw, Row, X, Y } from "./Types";
+import { Marks, Raw, Row, X, Y } from "./models";
 
 
 const l = {

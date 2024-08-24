@@ -6,7 +6,7 @@ import { format } from "core/numbers";
 import Svg from "core/ui/Svg";
 import Box from "core/ui/Box";
 
-import { Item, Row, X, Y } from "./Types";
+import { Item, Row, X, Y } from "./models";
 import Loading from "core/ui/Loading";
 
 

@@ -36,3 +36,16 @@ export type Bin = {
 export type MarksType = XType & YType & {
   binned: Bin[]
 }
+
+export type Store = {
+  migrants: Migrant[]
+  atlas: Atlas | null,
+
+  setMigrants: (_: Migrant[]) => void
+  setAtlas: (_: Atlas) => void,
+
+  axis: {
+    x: (_: Migrant) => Date,
+    y: (_: Migrant) => number
+  }
+}
