@@ -8,6 +8,7 @@ import Line from "pages/Line";
 import Map from "pages/Map";
 import Pie from "pages/Pie";
 import Scatter from "pages/Scatter";
+import Migrants from "pages/Migrants";
 
 
 const routes: RouteObject[] = [
@@ -38,6 +39,10 @@ const routes: RouteObject[] = [
 			{
 				path: "map",
 				element: <Map />
+			},
+			{
+				path: "migrants",
+				element: <Migrants />
 			}
 		]
 	}

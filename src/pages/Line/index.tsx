@@ -45,7 +45,7 @@ const useData = () => {
 	return data;
 };
 
-Line.X = ({ x, fmt }: X) =>	{
+Line.X = ({ x, fmt }: X) => {
 	return x.ticks().map((t, i) => (
 		<Svg.G transform={`translate(${x(t)},0)`} key={i}>
 			<Svg.Line y2={inner.height} className="stroke-gray-300" />
@@ -81,7 +81,7 @@ export default function Line() {
 	if (!data) return <Loading />;
 
 	const x = scaleTime()
-		.domain(extent(data, l.x) as [Date, Date] )
+		.domain(extent(data, l.x) as [Date, Date])
 		.range([0, inner.width])
 		.nice();
 
@@ -92,7 +92,7 @@ export default function Line() {
 
 
 	return (
-		<Box.Column className="h-dvh">
+		<Box.Column>
 			<Svg width={l.width} height={l.height}>
 				<Svg.G transform={`translate(${l.margin.left},${l.margin.top})`}>
 					<Line.X x={x} />

@@ -13,6 +13,7 @@ Layout.Header = () => {
 			<Link to="/map">Map</Link>
 			<Link to="/scatter">Scatter Plot</Link>
 			<Link to="/map">Map</Link>
+			<Link to="/migrants">Migrants</Link>
 		</nav>
 	);
 };

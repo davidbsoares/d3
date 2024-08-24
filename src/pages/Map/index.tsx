@@ -29,7 +29,7 @@ export default function Map() {
 		.range([0, 15]);
 
 	return (
-		<Box.Column className="h-dvh">
+		<Box.Column>
 			<Svg width={l.width} height={l.height}>
 				<Svg.G>
 					<Svg.Path d={path({ type: "Sphere" }) || ""} fill="#fbfbfb" />

@@ -112,7 +112,7 @@ export default function Scatter() {
 	};
 
 	return (
-		<Box.Column className="h-dvh">
+		<Box.Column>
 			<Box className="justify-center gap-8">
 				<Filter filter="x" setFilter={setFilter} />
 				<Filter filter="y" setFilter={setFilter} />

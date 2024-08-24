@@ -28,7 +28,7 @@ const useData = () => {
 	const [data, setData] = useState<Row[]>();
 
 	useEffect(() => {
-		const row = (d:Row) => {
+		const row = (d: Row) => {
 			d.Population = `${parseInt(d["2020"]) * 1000}`;
 			return d;
 		};
@@ -38,7 +38,7 @@ const useData = () => {
 	return data;
 };
 
-Bar.X = ({ x, fmt }: X) =>	{
+Bar.X = ({ x, fmt }: X) => {
 	return x.ticks().map(t => (
 		<Svg.G transform={`translate(${x(t)},0)`} key={t}>
 			<Svg.Line y2={inner.height} className="stroke-gray-300" />
@@ -64,12 +64,12 @@ export default function Bar() {
 	const x = scaleLinear().domain([0, max(data, l.y) || 100]).range([0, inner.width]);
 
 	return (
-		<Box.Column className="h-dvh">
+		<Box.Column>
 			<Svg width={l.width} height={l.height}>
 				<Svg.G transform={`translate(${l.margin.left},${l.margin.right})`}>
 					<Bar.X x={x} />
 					<Bar.Y y={y} />
-					<Svg.Text x={inner.width / 2} y={inner.height + 40 } textAnchor="middle" className="text-2xl fill-gray-500" >Population</Svg.Text>
+					<Svg.Text x={inner.width / 2} y={inner.height + 40} textAnchor="middle" className="text-2xl fill-gray-500" >Population</Svg.Text>
 					{data.map(d => <Bar.Item x={x} y={y} d={d} key={d.Country} />)}
 				</Svg.G>
 			</Svg>
