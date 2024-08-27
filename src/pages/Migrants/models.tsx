@@ -21,10 +21,19 @@ export type Migrant = {
 
 export type XType = {
   x: ScaleTime<number, number, never>;
+  height: number;
 }
 
 export type YType = {
   y: ScaleLinear<number, number, never>;
+  width: number;
+}
+
+export type MarksType = {
+  x: ScaleTime<number, number, never>;
+  y: ScaleLinear<number, number, never>;
+  height: number;
+  binned: Bin[];
 }
 
 export type Bin = {
@@ -33,8 +42,10 @@ export type Bin = {
   x1: number;
 }
 
-export type MarksType = XType & YType & {
-  binned: Bin[]
+export type HistogramType = {
+  height: number;
+  width: number;
+  position: number;
 }
 
 export type Store = {
