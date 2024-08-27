@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { scaleTime, scaleLinear, extent, timeMonths, bin, sum, max, brushX, select } from "d3";
 
 import dates from "core/dates";
 import Svg from "core/ui/Svg";
 
 import { Bin, HistogramType, MarksType, XType, YType } from "../models";
-import { useMigrants } from "../fabric";
+import useStore from "../data";
 
 
 const X = ({ x, height }: XType) => {
@@ -35,8 +35,8 @@ const Marks = ({ x, y, height, binned }: MarksType) => binned.map((b, i) => (
 	/>
 ));
 
-export default function Histogram({ height, width, position }: HistogramType) {
-	const { raw, axis, setExtent } = useMigrants();
+export default function Histogram({ height, width, position, setBrushExtent }: HistogramType) {
+	const { raw, axis } = useStore();
 	const ref = useRef<SVGGElement>(null);
 
 	const config = {
@@ -50,40 +50,40 @@ export default function Histogram({ height, width, position }: HistogramType) {
 		}
 	};
 
-	const x = scaleTime()
+	const x = useMemo(() => scaleTime()
 		.domain(extent(raw, axis.x) as [Date, Date])
 		.range([0, config.inner.width])
-		.nice();
+		.nice(), [raw]);
 
-	const [start, stop] = x.domain();
-	const t = timeMonths(start, stop).map(d => d.getTime());
-
-	const binned = bin()
-		// @ts-expect-error: strange type limitation in bin. Investigate
-		.value(axis.x)
-		.domain([start.getTime(), stop.getTime()])
-		// @ts-expect-error: strange type limitation in bin. Investigate
-		.thresholds(t)(raw)
-		.map<Bin>(array => ({
+	const binned = useMemo(() => {
+		const [start, stop] = x.domain();
+		const t = timeMonths(start, stop).map(d => d.getTime());
+		return bin()
 			// @ts-expect-error: strange type limitation in bin. Investigate
-			y: sum(array, axis.y),
-			x0: array.x0 as number,
-			x1: array.x1 as number
-		}));
+			.value(axis.x)
+			.domain([start.getTime(), stop.getTime()])
+			// @ts-expect-error: strange type limitation in bin. Investigate
+			.thresholds(t)(raw)
+			.map<Bin>(array => ({
+				// @ts-expect-error: strange type limitation in bin. Investigate
+				y: sum(array, axis.y),
+				x0: array.x0 as number,
+				x1: array.x1 as number
+			}));
+	}, [raw, x]);
 
-	const y = scaleLinear()
+	const y = useMemo(() => scaleLinear()
 		.domain([0, max(binned, (d) => d.y)] as [number, number])
-		.range([config.inner.height, 0]);
-
+		.range([config.inner.height, 0]), [binned]);
 
 	useEffect(() => {
 		if (ref.current) {
 			const brush = brushX().extent([[0, 0], [config.inner.width, config.inner.height]]);
 
 			brush(select(ref.current));
-			brush.on("brush end", (e) => setExtent(e.selection ? e.selection.map(x.invert) : []));
+			brush.on("brush end", (e) => setBrushExtent(e.selection ? e.selection.map(x.invert) : []));
 		}
-	}, [width, height, ref]);
+	}, [ref]);
 
 	return (
 		<Svg.G transform={`translate(0, ${position})`}>

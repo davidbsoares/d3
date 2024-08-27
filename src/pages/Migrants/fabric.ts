@@ -12,7 +12,7 @@ const csvUrl = "https://gist.githubusercontent.com/curran/a9656d711a8ad31d812b8f
 
 
 export function useAtlas() {
-	const { atlas, axis, setAtlas } = useStore();
+	const { atlas, setAtlas } = useStore();
 
 	useEffect(() => {
 		if (!atlas) json<Topology>(jsonUrl).then(t => {
@@ -24,11 +24,11 @@ export function useAtlas() {
 		});
 	}, []);
 
-	return { atlas, axis };
+	return atlas;
 }
 
 export function useMigrants() {
-	const { migrants, axis, raw, setRaw, extent, setMigrants, setExtent } = useStore();
+	const { raw, axis, setRaw } = useStore();
 
 	const parse = (d: MigrantRaw): Migrant => ({
 		total: +d["Total Dead and Missing"],
@@ -37,19 +37,8 @@ export function useMigrants() {
 	});
 
 	useEffect(() => {
-		if (!migrants.length) csv(csvUrl, parse).then(setRaw);
+		if (!raw.length) csv(csvUrl, parse).then(setRaw);
 	}, []);
 
-	useEffect(() => {
-		if (extent.length) {
-			const filter = raw.filter(d => {
-				const date = axis.x(d);
-				return date > extent[0] && date < extent[1];
-			});
-			setMigrants(filter);
-		}
-		else setMigrants(raw);
-	}, [extent, raw]);
-
-	return { raw, migrants, axis, setExtent };
+	return { raw, axis };
 }

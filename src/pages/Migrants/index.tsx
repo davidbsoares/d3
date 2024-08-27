@@ -6,6 +6,7 @@ import { useAtlas, useMigrants } from "./fabric";
 
 import Map from "./components/Map";
 import Histogram from "./components/Histogram";
+import { useState } from "react";
 
 
 const config = {
@@ -20,15 +21,22 @@ const config = {
 };
 
 export default function Migrants() {
-	const { atlas } = useAtlas();
-	const { migrants } = useMigrants();
+	const atlas = useAtlas();
+	const { raw, axis } = useMigrants();
+	const [brushExtent, setBrushExtent] = useState<Date[]>([]);
 
-	if (!migrants.length || !atlas) return <Loading />;
+	if (!raw.length || !atlas) return <Loading />;
+
+	const filteredData = brushExtent ? raw.filter(d => {
+		const date = axis.x(d);
+		return date > brushExtent[0] && date < brushExtent[1];
+	}) : raw;
+
 	return (
 		<Box.Column>
 			<Svg width={config.width} height={config.height}>
-				<Map />
-				<Histogram position={config.histogram.position} height={config.histogram.height} width={config.width} />
+				<Map data={filteredData} />
+				<Histogram setBrushExtent={setBrushExtent} position={config.histogram.position} height={config.histogram.height} width={config.width} />
 			</Svg>
 		</Box.Column>
 	);

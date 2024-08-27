@@ -1,5 +1,6 @@
 import { ScaleLinear, ScaleTime } from "d3";
 import { FeatureCollection, MultiLineString } from "geojson";
+import { Dispatch } from "react";
 
 
 export type Atlas = {
@@ -36,6 +37,14 @@ export type MarksType = {
   binned: Bin[];
 }
 
+export type WorldType = {
+  atlas: Atlas
+}
+
+export type MapType = {
+  data: Migrant[]
+}
+
 export type Bin = {
   y: number;
   x0: number;
@@ -46,18 +55,17 @@ export type HistogramType = {
   height: number;
   width: number;
   position: number;
+  setBrushExtent: Dispatch<React.SetStateAction<Date[]>>
 }
 
 export type Store = {
   raw: Migrant[];
   migrants: Migrant[];
   atlas: Atlas | null;
-  extent: Date[];
 
   setRaw: (_: Migrant[]) => void;
   setMigrants: (_: Migrant[]) => void;
   setAtlas: (_: Atlas) => void;
-  setExtent: (_: Date[]) => void;
 
   axis: {
     x: (_: Migrant) => Date,
