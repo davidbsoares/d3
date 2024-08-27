@@ -21,3 +21,16 @@ export type City = {
   lng: number;
   population: number;
 }
+
+
+export type Store = {
+  cities: City[];
+  atlas: Atlas | null;
+
+  setCities: (_: City[]) => void;
+  setAtlas: (_: Atlas) => void;
+
+  axis: {
+    size: (_: City) => number
+  };
+}
