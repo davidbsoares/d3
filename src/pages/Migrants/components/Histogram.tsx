@@ -1,4 +1,5 @@
-import { scaleTime, scaleLinear, extent, timeMonths, bin, sum, max } from "d3";
+import { useEffect, useRef } from "react";
+import { scaleTime, scaleLinear, extent, timeMonths, bin, sum, max, brushX, select } from "d3";
 
 import dates from "core/dates";
 import Svg from "core/ui/Svg";
@@ -35,7 +36,8 @@ const Marks = ({ x, y, height, binned }: MarksType) => binned.map((b, i) => (
 ));
 
 export default function Histogram({ height, width, position }: HistogramType) {
-	const { migrants, axis } = useMigrants();
+	const { raw, axis, setExtent } = useMigrants();
+	const ref = useRef<SVGGElement>(null);
 
 	const config = {
 		margin: { top: 0, right: 30, bottom: 25, left: 60 },
@@ -49,7 +51,7 @@ export default function Histogram({ height, width, position }: HistogramType) {
 	};
 
 	const x = scaleTime()
-		.domain(extent(migrants, axis.x) as [Date, Date])
+		.domain(extent(raw, axis.x) as [Date, Date])
 		.range([0, config.inner.width])
 		.nice();
 
@@ -61,7 +63,7 @@ export default function Histogram({ height, width, position }: HistogramType) {
 		.value(axis.x)
 		.domain([start.getTime(), stop.getTime()])
 		// @ts-expect-error: strange type limitation in bin. Investigate
-		.thresholds(t)(migrants)
+		.thresholds(t)(raw)
 		.map<Bin>(array => ({
 			// @ts-expect-error: strange type limitation in bin. Investigate
 			y: sum(array, axis.y),
@@ -72,6 +74,16 @@ export default function Histogram({ height, width, position }: HistogramType) {
 	const y = scaleLinear()
 		.domain([0, max(binned, (d) => d.y)] as [number, number])
 		.range([config.inner.height, 0]);
+
+
+	useEffect(() => {
+		if (ref.current) {
+			const brush = brushX().extent([[0, 0], [config.inner.width, config.inner.height]]);
+
+			brush(select(ref.current));
+			brush.on("brush end", (e) => setExtent(e.selection ? e.selection.map(x.invert) : []));
+		}
+	}, [width, height, ref]);
 
 	return (
 		<Svg.G transform={`translate(0, ${position})`}>
@@ -86,6 +98,7 @@ export default function Histogram({ height, width, position }: HistogramType) {
 				<Svg.Text x={config.inner.width / 2} y={config.inner.height + config.label.x} textAnchor="middle" className="text-[0.6em] fill-gray-500">
 					Time
 				</Svg.Text>
+				<Svg.G ref={ref} />
 			</Svg.G>
 		</ Svg.G>
 	);

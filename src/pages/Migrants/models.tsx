@@ -49,14 +49,18 @@ export type HistogramType = {
 }
 
 export type Store = {
-  migrants: Migrant[]
-  atlas: Atlas | null,
+  raw: Migrant[];
+  migrants: Migrant[];
+  atlas: Atlas | null;
+  extent: Date[];
 
-  setMigrants: (_: Migrant[]) => void
-  setAtlas: (_: Atlas) => void,
+  setRaw: (_: Migrant[]) => void;
+  setMigrants: (_: Migrant[]) => void;
+  setAtlas: (_: Atlas) => void;
+  setExtent: (_: Date[]) => void;
 
   axis: {
     x: (_: Migrant) => Date,
     y: (_: Migrant) => number
-  }
+  };
 }

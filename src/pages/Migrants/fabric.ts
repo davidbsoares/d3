@@ -28,7 +28,7 @@ export function useAtlas() {
 }
 
 export function useMigrants() {
-	const { migrants, axis, setMigrants } = useStore();
+	const { migrants, axis, raw, setRaw, extent, setMigrants, setExtent } = useStore();
 
 	const parse = (d: MigrantRaw): Migrant => ({
 		total: +d["Total Dead and Missing"],
@@ -37,8 +37,19 @@ export function useMigrants() {
 	});
 
 	useEffect(() => {
-		if (!migrants.length) csv(csvUrl, parse).then(setMigrants);
+		if (!migrants.length) csv(csvUrl, parse).then(setRaw);
 	}, []);
 
-	return { migrants, axis };
+	useEffect(() => {
+		if (extent.length) {
+			const filter = raw.filter(d => {
+				const date = axis.x(d);
+				return date > extent[0] && date < extent[1];
+			});
+			setMigrants(filter);
+		}
+		else setMigrants(raw);
+	}, [extent, raw]);
+
+	return { raw, migrants, axis, setExtent };
 }

@@ -3,11 +3,15 @@ import { Atlas, Migrant, Store } from "./models";
 
 
 const useStore = create<Store>((set) => ({
+	raw: [],
 	migrants: [],
 	atlas: null,
+	extent: [],
 
+	setRaw: (data) => set(() => ({ raw: data })),
 	setMigrants: (data) => set(() => ({ migrants: data })),
 	setAtlas: (data: Atlas) => set(() => ({ atlas: data })),
+	setExtent: (extent: Date[]) => set(() => ({ extent })),
 	axis: {
 		x: (d: Migrant) => d.date,
 		y: (d: Migrant) => d.total

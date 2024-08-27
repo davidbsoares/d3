@@ -1,4 +1,4 @@
-import { SVGProps } from "react";
+import { forwardRef, SVGProps } from "react";
 
 type SvgProps = SVGProps<SVGSVGElement>;
 type Circle = SVGProps<SVGCircleElement>;
@@ -10,12 +10,12 @@ type Text = SVGProps<SVGTextElement>;
 type Title = React.HTMLAttributes<HTMLTitleElement>
 
 
-Svg.Circle = (props: Circle) => <circle {...props}/>;
-Svg.G = (props: G) => <g {...props}/>;
-Svg.Line = (props: Line) => <line {...props}/>;
-Svg.Path = (props: Path) => <path {...props}/>;
-Svg.Rect = (props: Rect) => <rect {...props}/>;
-Svg.Text = (props: Text) => <text {...props}/>;
-Svg.Title = (props: Title) => <title {...props}/>;
+Svg.Circle = (props: Circle) => <circle {...props} />;
+Svg.G = forwardRef<SVGGElement, G>((props, ref) => <g {...props} ref={ref} />);
+Svg.Line = (props: Line) => <line {...props} />;
+Svg.Path = (props: Path) => <path {...props} />;
+Svg.Rect = (props: Rect) => <rect {...props} />;
+Svg.Text = (props: Text) => <text {...props} />;
+Svg.Title = (props: Title) => <title {...props} />;
 
-export default function Svg(props : SvgProps) {return <svg {...props} />;}
+export default function Svg(props: SvgProps) { return <svg {...props} />; }
